@@ -1,3 +1,7 @@
+# Fleet specific
+.fleet
+.idea
+
 /vendor/
 node_modules/
 npm-debug.log

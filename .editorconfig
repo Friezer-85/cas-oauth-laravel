@@ -1,0 +1,6 @@
+root = true
+
+# 2 tab indentation
+[*]
+indent_style = space
+indent_size = 2
