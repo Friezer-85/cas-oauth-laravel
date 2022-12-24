@@ -32,7 +32,7 @@ class ServiceProvider extends IServiceProvider
       'redirect' => url('/oauth/callback')
     ]);
 
-    Event::listen(\SocialiteProviders\Manager\SocialiteWasCalled::class, "\SocialiteProviders\{$providerName}\{$providerName}ExtendSocialite@handle");
+    Event::listen(\SocialiteProviders\Manager\SocialiteWasCalled::class, "\SocialiteProviders\\$providerName\\$providerName" . "ExtendSocialite@handle");
   }
 
   /**
