@@ -21,7 +21,7 @@ class CasController extends Controller
   public function login(): Response | RedirectResponse {
     $service = request()->get('service');
     $matches = false;
-    $user = session('cas.user');
+    $user = session('cas-oauth.cas.user');
 
     foreach (config('services.cas') as $regex) {
       if (preg_match($regex, $service)) {
@@ -41,11 +41,11 @@ class CasController extends Controller
     $now = Carbon::now()->timestamp;
     $ticket = env('CAS_TICKET_PREFIX') . '-' . base64_encode("{$user->getId()}-$service-$now");
 
-    Cache::add("cas.tickets.$now", $ticket);
-    Cache::add("cas.users." . env('OAUTH_PROVIDER') . ".{$user->getId()}", $user);
+    Cache::add("cas-oauth.cas.tickets.$now", $ticket);
+    Cache::add("cas-oauth.cas.users." . env('OAUTH_PROVIDER') . ".{$user->getId()}", $user);
     session()->forget([
-      'cas.service',
-      'cas.user'
+      'cas-oauth.cas.service',
+      'cas-oauth.cas.user'
     ]);
 
     return redirect($service . '?ticket=' . $ticket);
@@ -69,7 +69,7 @@ class CasController extends Controller
         throw new \Exception('NO_TICKET: Ticket not provided.');
       }
 
-      if (!Cache::get("cas.tickets.{$ticket}")) {
+      if (!Cache::get("cas-oauth.cas.tickets.{$ticket}")) {
         throw new \Exception('INVALID_TICKET: Ticket ' . $ticket . ' not recognized.');
       }
 
@@ -83,8 +83,8 @@ class CasController extends Controller
       ] = explode(': ', $e->getMessage());
 
       $response = [
-              'authenticationFailure' => [
-                      'code' => $code,
+          'authenticationFailure' => [
+          'code' => $code,
           'description' => $description
         ]
       ];
@@ -95,13 +95,13 @@ class CasController extends Controller
         'authenticationSuccess' => [
           'user' => $decoded[0],
           'attributes' => [
-                  'not_implemented' => 'The Laravel package will include in a future version the attributes of the user.'
+            'not_implemented' => 'The Laravel package will include in a future version the attributes of the user.'
           ]
         ]
       ];
     }
 
-    Cache::delete("cas.tickets.{$ticket}");
+    Cache::delete("cas-oauth.cas.tickets.{$ticket}");
     return response()
       ->view('cas-oauth::ticket', $response)
       ->header('Content-Type', 'application/xml');
