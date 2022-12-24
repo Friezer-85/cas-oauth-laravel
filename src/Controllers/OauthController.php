@@ -18,7 +18,7 @@ class OauthController extends Controller
    */
   public function login(): RedirectResponse
   {
-    session()->put('cas.service', request()->get('service'));
+    session()->put('cas-oauth.cas.service', request()->get('service'));
     return Socialite::driver(env('OAUTH_PROVIDER'))
       ->scopes(['identify'])
       ->redirect();
@@ -32,10 +32,10 @@ class OauthController extends Controller
   public function callback(): RedirectResponse
   {
     try {
-      session()->put('cas.user', Socialite::driver(env('OAUTH_PROVIDER'))->user());
-      return redirect()->route('cas.login', ['service' => session('cas.service')]);
+      session()->put('cas-oauth.cas.user', Socialite::driver(env('OAUTH_PROVIDER'))->user());
+      return redirect()->route('cas-oauth.cas.login', ['service' => session('cas-oauth.cas.service')]);
     } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
-      return redirect()->route('oauth.login', ['service' => session('cas.service')]);
+      return redirect()->route('cas-oauth.oauth.login', ['service' => session('cas-oauth.cas.service')]);
     }
   }
 }
