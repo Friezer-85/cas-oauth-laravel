@@ -14,23 +14,28 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group([
-  'prefix' => '/cas/',
-  'as' => 'cas.'
+  'as' => 'cas-oauth.',
+  'middleware' => 'web'
 ], function () {
-  Route::get('/login', '\Micorksen\CasOauth\Controllers\CasController@login')
-    ->name('login');
+  Route::group([
+    'prefix' => '/cas/',
+    'as' => 'cas.'
+  ], function () {
+    Route::get('/login', '\Micorksen\CasOauth\Controllers\CasController@login')
+      ->name('login');
 
-  Route::get('/serviceValidate', '\Micorksen\CasOauth\Controllers\CasController@serviceValidate')
-    ->name('serviceValidate');
-});
+    Route::get('/serviceValidate', '\Micorksen\CasOauth\Controllers\CasController@serviceValidate')
+      ->name('serviceValidate');
+  });
 
-Route::group([
-  'prefix' => '/oauth/',
-  'as' => 'oauth.'
-], function () {
-  Route::get('/login', '\Micorksen\CasOauth\Controllers\OauthController@login')
-    ->name('login');
+  Route::group([
+      'prefix' => '/oauth/',
+      'as' => 'oauth.'
+  ], function () {
+    Route::get('/login', '\Micorksen\CasOauth\Controllers\OauthController@login')
+      ->name('login');
 
-  Route::get('/callback', '\Micorksen\CasOauth\Controllers\OauthController@callback')
-    ->name('callback');
+    Route::get('/callback', '\Micorksen\CasOauth\Controllers\OauthController@callback')
+      ->name('callback');
+  });
 });
