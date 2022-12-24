@@ -25,12 +25,16 @@ class ServiceProvider extends IServiceProvider
    */
   private function requirements(): bool
   {
-    $casTicketPrefix = env('CAS_TICKET_PREFIX');
-    $providerName = env('OAUTH_PROVIDER');
-    $clientId = env('OAUTH_CLIENT_ID');
-    $clientSecret = env('OAUTH_CLIENT_SECRET');
+    $casTicketPrefix = );
+    $providerName = ;
+    $clientId = ;
+    $clientSecret = ;
 
-    return $casTicketPrefix && $providerName && $clientId && $clientSecret;
+    return env('CAS_TICKET_PREFIX')
+           && env('OAUTH_PROVIDER')
+           && env('OAUTH_CLIENT_ID')
+           && env('OAUTH_CLIENT_SECRET')
+           && (config('services.cas', []) !== []);
   }
 
   /**
