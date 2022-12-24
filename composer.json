@@ -23,13 +23,13 @@
     },
     "extra": {
         "laravel": {
-            "providers": [
+			"providers": [
                 "Micorksen\\CasOauth\\ServiceProvider"
             ]
         }
     },
     "require": {
         "laravel/framework": "^9.45",
-        "laravel/socialite": "^5.5"
+        "socialiteproviders/manager": "^4.2"
     }
 }
