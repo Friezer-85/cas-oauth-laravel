@@ -41,6 +41,7 @@ class ServiceProvider extends IServiceProvider
    */
   public function boot()
   {
+    $providerName = env('OAUTH_PROVIDER');
     if (!$this->requirements()) {
       return;
     }
