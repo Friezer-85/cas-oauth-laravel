@@ -35,7 +35,7 @@ class CasController extends Controller
     }
 
     if (!$user) {
-      return redirect()->route('oauth.login', ['service' => $service]);
+      return redirect()->route('cas-oauth.oauth.login', ['service' => $service]);
     }
 
     $now = Carbon::now()->timestamp;
