@@ -30,7 +30,7 @@ class ServiceProvider extends IServiceProvider
     $clientId = env('OAUTH_CLIENT_ID');
     $clientSecret = env('OAUTH_CLIENT_SECRET');
 
-    return !$casTicketPrefix || !$providerName || !$clientId || !$clientSecret;
+    return $casTicketPrefix && $providerName && $clientId && $clientSecret;
   }
 
   /**
@@ -55,7 +55,7 @@ class ServiceProvider extends IServiceProvider
       'redirect' => $redirect
     ]);
 
-    Event::listen(\SocialiteProviders\Manager\SocialiteWasCalled::class, "\SocialiteProviders\\$providerName\\$providerName" . "ExtendSocialite@handle");
+    Event::listen(\SocialiteProviders\Manager\SocialiteWasCalled::class, "\SocialiteProviders\\" . ucfirst($providerName) . "\\" . ucfirst($providerName) . "ExtendSocialite@handle");
   }
 
   /**
