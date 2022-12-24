@@ -29,9 +29,8 @@ class ServiceProvider extends IServiceProvider
     $providerName = env('OAUTH_PROVIDER');
     $clientId = env('OAUTH_CLIENT_ID');
     $clientSecret = env('OAUTH_CLIENT_SECRET');
-    $redirect = url('/oauth/callback');
 
-    return !$casTicketPrefix || !$providerName || !$clientId || !$clientSecret || !$redirect;
+    return !$casTicketPrefix || !$providerName || !$clientId || !$clientSecret;
   }
 
   /**
@@ -42,6 +41,10 @@ class ServiceProvider extends IServiceProvider
   public function boot()
   {
     $providerName = env('OAUTH_PROVIDER');
+    $clientId = env('OAUTH_CLIENT_ID');
+    $clientSecret = env('OAUTH_CLIENT_SECRET');
+    $redirect = url('/oauth/callback');
+
     if (!$this->requirements()) {
       return;
     }
