@@ -8,17 +8,6 @@ use Illuminate\Support\Facades\Event;
 class ServiceProvider extends IServiceProvider
 {
   /**
-   * The event handler mappings for the application.
-   *
-   * @var array
-   */
-  protected $listen = [
-    \SocialiteProviders\Manager\SocialiteWasCalled::class => [
-      'SocialiteProviders\Discord\\DiscordExtendSocialite@handle'
-    ]
-  ];
-
-  /**
    * Check that the requirements are configured.
    *
    * @return bool
