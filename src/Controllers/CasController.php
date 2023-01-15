@@ -31,7 +31,7 @@ class CasController extends Controller
     }
 
     if (!$service || !$matches) {
-      // TODO : Erreur quand l'utilisateur ne peut pas se connecter.
+      return response('The service isn\'t authorized to use the CAS.', 400);
     }
 
     if (!$user) {
@@ -39,10 +39,10 @@ class CasController extends Controller
     }
 
     $now = Carbon::now()->timestamp;
-    $ticket = env('CAS_TICKET_PREFIX') . '-' . base64_encode("{$user->getId()}-$service-$now");
+    $ticket = env('CAS_TICKET_PREFIX') . '-' . base64_encode("{$user[env('CAS_ID_PROP', 'id')]}-$service-$now");
 
     Cache::add("cas-oauth.cas.tickets.$now", $ticket);
-    Cache::add("cas-oauth.cas.users." . env('OAUTH_PROVIDER') . ".{$user->getId()}", $user);
+    Cache::add("cas-oauth.cas.users." . env('OAUTH_PROVIDER') . ".{$user[env('CAS_ID_PROP', 'id')]}", $user);
     session()->forget([
       'cas-oauth.cas.service',
       'cas-oauth.cas.user'
@@ -70,7 +70,7 @@ class CasController extends Controller
       }
 
       if (!Cache::get("cas-oauth.cas.tickets.{$ticket}")) {
-        throw new \Exception('INVALID_TICKET: Ticket ' . $ticket . ' not recognized.');
+        throw new \Exception("INVALID_TICKET: Ticket {$ticket} not recognized.");
       }
 
       if ($decoded[1] !== $service) {
@@ -78,7 +78,7 @@ class CasController extends Controller
       }
     } catch (\Exception $e) {
       [
-              $code,
+        $code,
         $description
       ] = explode(': ', $e->getMessage());
 
