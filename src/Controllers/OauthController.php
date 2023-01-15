@@ -21,6 +21,7 @@ class OauthController extends Controller
     session()->put('cas-oauth.cas.service', request()->get('service'));
     return Socialite::driver(env('OAUTH_PROVIDER'))
       ->setScopes(['identify'])
+      ->with(env('OAUTH_PARAMS'))
       ->redirect();
   }
 
