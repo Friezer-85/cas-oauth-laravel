@@ -18,10 +18,19 @@ class OauthController extends Controller
    */
   public function login(): RedirectResponse
   {
+    $params = [];
+    foreach (explode(',', env('OAUTH_PARAMS', [])) as $s) {
+      [
+        $key,
+        $value
+      ] = explode('=', $s);
+      $params[$key] = $value;
+    }
+    
     session()->put('cas-oauth.cas.service', request()->get('service'));
     return Socialite::driver(env('OAUTH_PROVIDER'))
-      ->setScopes(['identify'])
-      ->with(env('OAUTH_PARAMS', []))
+      ->setScopes(explode(',', env('OAUTH_SCOPES', 'profile')))
+      ->with($params)
       ->redirect();
   }
 
