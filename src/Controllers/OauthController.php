@@ -29,7 +29,7 @@ class OauthController extends Controller
     
     session()->put('cas-oauth.cas.service', request()->get('service'));
     return Socialite::driver(env('OAUTH_PROVIDER'))
-      ->setScopes(explode(',', env('OAUTH_SCOPES', 'profile')))
+      ->setScopes(explode(',', env('OAUTH_SCOPES', 'openid,profile,email')))
       ->with($params)
       ->redirect();
   }
