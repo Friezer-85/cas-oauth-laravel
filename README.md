@@ -8,10 +8,10 @@
 * [X] `CAS_TICKET_PREFIX` : Prefix for the CAS ticket
 * [ ] `CAS_ID_PROP` : Property used for generating the CAS ticket *(default : `id`)*
 * [X] `OAUTH_PROVIDER` : Socialite driver to use.
-* [ ] `OAUTH_SCOPES` : Scopes to use *(default : `profile`)*.
+* [ ] `OAUTH_SCOPES` : Scopes to use, separated with commas *(default : `openid,profile,email`)*.
 * [X] `OAUTH_CLIENT_ID` : ID of your OAuth application.
 * [X] `OAUTH_CLIENT_SECRET` : Secret of your OAuth application.
-* [ ] `OAUTH_PARAMS` : Custom args to pass to the OAuth provider.
+* [ ] `OAUTH_PARAMS` : Custom args to pass to the OAuth provider, in format of `key=value`, separated with commas.
 
 <br /><ins>**Requirements :**</ins>
 
