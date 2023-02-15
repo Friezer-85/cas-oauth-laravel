@@ -91,7 +91,7 @@ class CasController extends Controller
     }
 
     $user = Cache::get("cas-oauth.cas.users.google.{$decoded[0]}");
-    if (isset($user->attributes['name']) {
+    if (isset($user->attributes['name'])) {
       [
         $first,
         $last
