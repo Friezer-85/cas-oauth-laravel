@@ -13,6 +13,7 @@
           @endif
         @endforeach
       </cas:attributes>
+    </cas:authenticationSuccess>
   @else
     <cas:authenticationFailure code='{{ $authenticationFailure['code'] }}'>{{ $authenticationFailure['description'] }}</cas:authenticationFailure>
   @endif
