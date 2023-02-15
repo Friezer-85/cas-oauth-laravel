@@ -39,7 +39,7 @@ class CasController extends Controller
     }
 
     $now = Carbon::now()->timestamp;
-    $ticket = env('CAS_TICKET_PREFIX') . '-' . base64_encode("{$user[env('CAS_ID_PROP', 'id')]}-$service-$now");
+    $ticket = env('CAS_TICKET_PREFIX') . '-' . base64_encode("{$user[env('CAS_ID_PROP', 'id')]}|$service|$now");
 
     Cache::add("cas-oauth.cas.tickets.$now", $ticket);
     Cache::add("cas-oauth.cas.users." . env('OAUTH_PROVIDER') . ".{$user[env('CAS_ID_PROP', 'id')]}", $user);
@@ -62,14 +62,14 @@ class CasController extends Controller
   {
     $ticket = request()->input('ticket');
     $service = request()->input('service');
-    $decoded = explode('-', base64_decode(str_replace(env('CAS_TICKET_PREFIX') . '-', '', $ticket)));
+    $decoded = explode('|', base64_decode(str_replace(env('CAS_TICKET_PREFIX') . '-', '', $ticket)));
 
     try {
       if (!$ticket) {
         throw new \Exception('NO_TICKET: Ticket not provided.');
       }
 
-      if (!Cache::get("cas-oauth.cas.tickets.{$ticket}")) {
+      if (!Cache::get("cas-oauth.cas.tickets.{$decoded[2]}")) {
         throw new \Exception("INVALID_TICKET: Ticket {$ticket} not recognized.");
       }
 
@@ -83,25 +83,33 @@ class CasController extends Controller
       ] = explode(': ', $e->getMessage());
 
       $response = [
-          'authenticationFailure' => [
+        'authenticationFailure' => [
           'code' => $code,
           'description' => $description
         ]
       ];
     }
 
+    $user = Cache::get("cas-oauth.cas.users.google.{$decoded[0]}");
+    if (isset($user->attributes['name']) {
+      [
+        $first,
+        $last
+      ] = explode(' ', $user->attributes['name']);
+      $user->attributes['first_name'] = $first;
+      $user->attributes['last_name'] = $last;
+    }
+    
     if (!isset($response)) {
       $response = [
         'authenticationSuccess' => [
           'user' => $decoded[0],
-          'attributes' => [
-            'not_implemented' => 'The Laravel package will include in a future version the attributes of the user.'
-          ]
+          'attributes' => $user->attributes
         ]
       ];
     }
 
-    Cache::delete("cas-oauth.cas.tickets.{$ticket}");
+    Cache::delete("cas-oauth.cas.tickets.{$decoded[2]}");
     return response()
       ->view('cas-oauth::ticket', $response)
       ->header('Content-Type', 'application/xml');
