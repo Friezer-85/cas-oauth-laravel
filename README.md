@@ -3,7 +3,7 @@
 
 <ins>**Configuration :**</ins>
 
-**⚠️ Note: You need to add checked variables into the `.env` file, else, the package won't route anything.**
+**⚠️ Note: You need to add checked variables into the `.env` file and create a service, else, the package won't route anything.**
 
 * [X] `CAS_TICKET_PREFIX` : Prefix for the CAS ticket
 * [ ] `CAS_ID_PROP` : Property used for generating the CAS ticket *(default : `id`)*
