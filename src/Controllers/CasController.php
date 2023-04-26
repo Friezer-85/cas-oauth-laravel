@@ -39,7 +39,7 @@ class CasController extends Controller
     }
 
     $now = Carbon::now()->timestamp;
-    $ticket = env('CAS_TICKET_PREFIX') . '-' . base64_encode("{$user[env('CAS_ID_PROP', 'id')]}|$service|$now");
+    $ticket = 'ST-' . base64_encode("{$user[env('CAS_ID_PROP', 'id')]}|$service|$now");
 
     Cache::add("cas-oauth.cas.tickets.$now", $ticket);
     Cache::add("cas-oauth.cas.users." . env('OAUTH_PROVIDER') . ".{$user[env('CAS_ID_PROP', 'id')]}", $user);
@@ -62,7 +62,7 @@ class CasController extends Controller
   {
     $ticket = request()->input('ticket');
     $service = request()->input('service');
-    $decoded = explode('|', base64_decode(str_replace(env('CAS_TICKET_PREFIX') . '-', '', $ticket)));
+    $decoded = explode('|', base64_decode(str_replace('ST-', '', $ticket)));
 
     try {
       if (!$ticket) {
