@@ -14,8 +14,7 @@ class ServiceProvider extends IServiceProvider
    */
   private function requirements(): bool
   {
-    return env('CAS_TICKET_PREFIX')
-           && env('OAUTH_PROVIDER')
+    return env('OAUTH_PROVIDER')
            && env('OAUTH_CLIENT_ID')
            && env('OAUTH_CLIENT_SECRET')
            && (config('services.cas', []) !== []);
