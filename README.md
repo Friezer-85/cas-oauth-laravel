@@ -14,7 +14,7 @@
 
 <br /><ins>**Requirements :**</ins>
 
-* Install the package using `composer require micorksen/cas-oauth-laravel` and install your Socialite's driver, you're ready to go.
+* Install the package using `composer require micorksen/cas-oauth-laravel` and install your Socialite's driver. BOOM! You're ready to go.
 * Create a service in the `config/services.php` file, like this :
 ```php
 return [
