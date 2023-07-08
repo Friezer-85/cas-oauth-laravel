@@ -19,7 +19,7 @@ class OauthController extends Controller
   public function login(): RedirectResponse
   {
     $params = [];
-    foreach (explode(',', env('OAUTH_PARAMS', [])) as $s) {
+    foreach (explode(',', env('OAUTH_PARAMS', '')) as $s) {
       [
         $key,
         $value
