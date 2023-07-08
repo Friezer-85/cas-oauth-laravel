@@ -20,6 +20,10 @@ class OauthController extends Controller
   {
     $params = [];
     foreach (explode(',', env('OAUTH_PARAMS', '')) as $s) {
+      if (!$s) {
+        return;
+      }
+      
       [
         $key,
         $value
