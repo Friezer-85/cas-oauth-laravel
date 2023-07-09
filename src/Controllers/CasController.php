@@ -110,6 +110,7 @@ class CasController extends Controller
     }
 
     Cache::delete("cas-oauth.cas.tickets.{$decoded[2]}");
+    Cache::delete("cas-oauth.cas.users." . env('OAUTH_PROVIDER') . ".{$decoded[0]}");
     return response()
       ->view('cas-oauth::ticket', $response)
       ->header('Content-Type', 'application/xml');
