@@ -113,7 +113,7 @@ class CasController extends Controller
     }
 
     if ($attributes) {
-      $response['authenticationSuccess']['user']['attributes'] = $user->attributes;
+      $response['authenticationSuccess']['attributes'] = $user->attributes;
     }
 
     Cache::delete("cas-oauth.cas.tickets.{$decoded[2]}");
