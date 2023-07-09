@@ -31,7 +31,7 @@ class CasController extends Controller
     }
 
     if (!$service || !$matches) {
-      return response('The service isn\'t authorized to use the CAS.', 400);
+      return response('This service isn\'t authorized to use the CAS.', 400);
     }
 
     if (!$user) {
@@ -90,7 +90,7 @@ class CasController extends Controller
       ];
     }
 
-    $user = Cache::get("cas-oauth.cas.users.google.{$decoded[0]}");
+    $user = Cache::get("cas-oauth.cas.users." . env('OAUTH_PROVIDER') . ".{$decoded[0]}");
     if (isset($user->attributes['name'])) {
       [
         $first,
