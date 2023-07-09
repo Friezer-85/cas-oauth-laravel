@@ -62,7 +62,21 @@ class CasController extends Controller
    */
   public function samlValidate($attributes = true): Response
   {
-    $ticket = request()->get('ticket');
+	  function ticket_xml()
+    {
+	    $dom = new \DOMDocument();
+	    $dom->loadXML(request()->getContent());
+	    foreach ((new \DOMXpath($dom))->query('//SOAP-ENV:Body')->item(0)->childNodes as $node) {
+	      if ($node->nodeName === 'samlp:Request') {
+			    $ticket = trim($node->nodeValue);
+			    break;
+		    }
+	    }
+	
+	    return $ticket;
+	  }
+    
+    $ticket = !$attributes ? request()->get('ticket') : ticket_xml();
     $service = request()->input('service') ?? request()->input('target') ?? request()->input('TARGET');
     $decoded = explode('|', base64_decode(str_replace('ST-', '', $ticket)));
 
