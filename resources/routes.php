@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
   'as' => 'cas-oauth.',
-  'middleware' => 'web'
+  'middleware' => 'web',
+  'excluded_middleware' => [\App\Http\Middleware\VerifyCsrfToken::class],
 ], function () {
   Route::group([
     'prefix' => '/cas/',
