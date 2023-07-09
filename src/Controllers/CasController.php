@@ -63,7 +63,7 @@ class CasController extends Controller
   public function samlValidate($attributes = true): Response
   {
     $ticket = request()->input('ticket');
-    $service = request()->input('service');
+    $service = request()->input('service') || request()->input('target');
     $decoded = explode('|', base64_decode(str_replace('ST-', '', $ticket)));
     $response = [];
 
