@@ -62,15 +62,18 @@ class CasController extends Controller
    */
   public function samlValidate($attributes = true): Response
   {
-    $ticket = request()->input('ticket');
-    $service = request()->input('service') || request()->input('target');
+    $ticket = request()->get('ticket');
+    $service = request()->input('service') ?? request()->input('target') ?? request()->input('TARGET');
     $decoded = explode('|', base64_decode(str_replace('ST-', '', $ticket)));
-    $response = [];
 
     try {
-      if (!$ticket || !$service) {
+      if (!$ticket) {
         throw new \Exception('INVALID_REQUEST: Ticket not provided.');
       }
+		
+	  if (!$service) {
+		 throw new \Exception('INVALID_REQUEST: Service not provided.');
+	  }
 
       if (!Cache::get("cas-oauth.cas.tickets.{$decoded[2]}")) {
         throw new \Exception("INVALID_TICKET: Ticket {$ticket} not recognized.");
@@ -94,7 +97,19 @@ class CasController extends Controller
     }
 
     $user = Cache::get("cas-oauth.cas.users." . env('OAUTH_PROVIDER') . ".{$decoded[0]}");
-    if (isset($user->attributes['name']) && $attributes) {
+	  if (!isset($response)) {
+      $response = [
+        'authenticationSuccess' => [
+          'user' => $decoded[0],
+        ]
+      ];
+		
+      if ($attributes) {
+	      $response['authenticationSuccess']['attributes'] = $user->attributes;
+      }
+	  }
+	  
+    if (isset($user->attributes['name'])) {
       [
         $first,
         $last
@@ -103,20 +118,8 @@ class CasController extends Controller
       $user->attributes['last_name'] = $last;
       $user->attributes['id'] = strtoupper(substr($first, 0, 1) . strtr($last, 'àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ', 'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY'));
     }
-    
-    if ($response === []) {
-      $response = [
-        'authenticationSuccess' => [
-          'user' => $decoded[0]
-        ]
-      ];
-    }
 
-    if ($attributes) {
-      $response['authenticationSuccess']['attributes'] = $user->attributes;
-    }
-
-    Cache::delete("cas-oauth.cas.tickets.{$decoded[2]}");
+	  Cache::delete("cas-oauth.cas.tickets.{$decoded[2]}");
     Cache::delete("cas-oauth.cas.users." . env('OAUTH_PROVIDER') . ".{$decoded[0]}");
     return response()
       ->view('cas-oauth::ticket', $response)
