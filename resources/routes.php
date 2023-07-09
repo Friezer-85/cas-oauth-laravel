@@ -26,6 +26,9 @@ Route::group([
 
     Route::get('/serviceValidate', '\Micorksen\CasOauth\Controllers\CasController@serviceValidate')
       ->name('serviceValidate');
+
+    Route::post('/samlValidate', '\Micorksen\CasOauth\Controllers\CasController@samlValidate')
+      ->name('samlValidate');
   });
 
   Route::group([
