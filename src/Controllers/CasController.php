@@ -52,21 +52,24 @@ class CasController extends Controller
   }
 
   /**
-   * Provides the function for the `/serviceValidate` endpoint.
+   * Provides the function for the `/samlValidate` endpoint.
+   *
+   * @param bool $attributes
    *
    * @throws ContainerExceptionInterface
    * @throws NotFoundExceptionInterface
    * @return Response
    */
-  public function serviceValidate(): Response
+  public function samlValidate($attributes = true): Response
   {
     $ticket = request()->input('ticket');
     $service = request()->input('service');
     $decoded = explode('|', base64_decode(str_replace('ST-', '', $ticket)));
+    $response = [];
 
     try {
-      if (!$ticket) {
-        throw new \Exception('NO_TICKET: Ticket not provided.');
+      if (!$ticket || !$service) {
+        throw new \Exception('INVALID_REQUEST: Ticket not provided.');
       }
 
       if (!Cache::get("cas-oauth.cas.tickets.{$decoded[2]}")) {
@@ -74,7 +77,7 @@ class CasController extends Controller
       }
 
       if ($decoded[1] !== $service) {
-        throw new \Exception('MISMATCH_SERVICE: Service does not match ticket.');
+        throw new \Exception('INVALID_SERVICE: Service does not match ticket.');
       }
     } catch (\Exception $e) {
       [
@@ -91,22 +94,26 @@ class CasController extends Controller
     }
 
     $user = Cache::get("cas-oauth.cas.users." . env('OAUTH_PROVIDER') . ".{$decoded[0]}");
-    if (isset($user->attributes['name'])) {
+    if (isset($user->attributes['name']) && $attributes) {
       [
         $first,
         $last
       ] = explode(' ', $user->attributes['name']);
       $user->attributes['first_name'] = $first;
       $user->attributes['last_name'] = $last;
+      $user->attributes['id'] = strtoupper(substr($first, 0, 1) . strtr($last, 'àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ', 'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY'));
     }
     
-    if (!isset($response)) {
+    if ($response === []) {
       $response = [
         'authenticationSuccess' => [
-          'user' => $decoded[0],
-          'attributes' => $user->attributes
+          'user' => $decoded[0]
         ]
       ];
+    }
+
+    if ($attributes) {
+      $response['authenticationSuccess']['user']['attributes'] = $user->attributes
     }
 
     Cache::delete("cas-oauth.cas.tickets.{$decoded[2]}");
@@ -114,5 +121,17 @@ class CasController extends Controller
     return response()
       ->view('cas-oauth::ticket', $response)
       ->header('Content-Type', 'application/xml');
+  }
+  
+  /**
+   * Provides the function for the `/serviceValidate` endpoint.
+   *
+   * @throws ContainerExceptionInterface
+   * @throws NotFoundExceptionInterface
+   * @return Response
+   */
+  public function serviceValidate(): Response
+  {
+    return $this->samlValidate(false);
   }
 }
