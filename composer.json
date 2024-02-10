@@ -1,6 +1,6 @@
 {
     "name": "micorksen/cas-oauth-laravel",
-    "description": "A bridge for CAS server via OAuth providers.",
+    "description": "A way to bridge an OAuth provider to a CAS-only application.",
     "type": "library",
     "license": "GPL-3.0-only",
     "authors": [
@@ -9,11 +9,6 @@
             "email": "hello@micorksen.eu",
             "homepage": "https://micorksen.eu",
             "role": "Developer"
-        },
-        {
-            "name": "Maxime H.",
-            "email": "maximehery18@outlook.fr",
-            "role": "Maintainer"
         }
     ],
     "autoload": {
@@ -29,7 +24,7 @@
         }
     },
     "require": {
-        "laravel/framework": "^9.45",
-        "socialiteproviders/manager": "^4.2"
+        "laravel/framework": "^10.43",
+        "socialiteproviders/manager": "^4.4"
     }
 }
