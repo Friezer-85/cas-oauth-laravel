@@ -21,7 +21,7 @@ return [
   ...
   
   'cas' => [
-    '/https:\/\/my-beautiful-website.com\/(.*)/',
+    'https://micorksen.eu/(.*)',
   ],
 ];
 ```
