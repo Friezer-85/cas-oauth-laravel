@@ -14,14 +14,14 @@
 
 <br /><ins>**Requirements :**</ins>
 
-* Install the package using `composer require micorksen/cas-oauth-laravel` and install your Socialite's driver. BOOM! You're ready to go.
+* Install the package using `composer require friezer-85/cas-oauth-laravel` and install your Socialite's driver. BOOM! You're ready to go.
 * Create a service in the `config/services.php` file, like this :
 ```php
 return [
   ...
   
   'cas' => [
-    'https://micorksen.eu/(.*)',
+    'https://friezer.eu/(.*)',
   ],
 ];
 ```
