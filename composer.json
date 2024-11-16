@@ -31,6 +31,7 @@
     },
     "require": {
         "laravel/framework": "^10.43",
+        "laravel/installer": "^5.2.1",
         "socialiteproviders/manager": "^4.4"
     }
 }
