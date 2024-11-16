@@ -1,6 +1,6 @@
 <?php
 
-namespace Micorksen\CasOauth\Models;
+namespace Friezer\CasOauth\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use SocialiteProviders\Manager\OAuth2\User;

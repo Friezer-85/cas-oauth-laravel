@@ -1,6 +1,6 @@
 <?php
 
-namespace Micorksen\CasOauth\Controllers;
+namespace Friezer\CasOauth\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Laravel\Socialite\Facades\Socialite;

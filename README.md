@@ -14,7 +14,9 @@
 
 <br /><ins>**Requirements :**</ins>
 
+* Install a basic webserver environment, with PHP 8.1
 * Install the package using `composer require friezer-85/cas-oauth-laravel` and install your Socialite's driver. BOOM! You're ready to go.
+* Or clone this repo and install the packages using `composer install`
 * Create a service in the `config/services.php` file, like this :
 ```php
 return [

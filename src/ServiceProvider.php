@@ -1,6 +1,6 @@
 <?php
 
-namespace Friezer-85\CasOauth;
+namespace Friezer\CasOauth;
 
 use Illuminate\Support\ServiceProvider as IServiceProvider;
 use Illuminate\Support\Facades\Event;

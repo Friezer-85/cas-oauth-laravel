@@ -1,6 +1,6 @@
 <?php
 
-namespace Micorksen\CasOauth\Controllers;
+namespace Friezer\CasOauth\Controllers;
 
 use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
@@ -9,8 +9,8 @@ use Psr\Container\NotFoundExceptionInterface;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 
-use Micorksen\CasOauth\Models\Ticket;
-use Micorksen\CasOauth\Models\Service;
+use Friezer\CasOauth\Models\Ticket;
+use Friezer\CasOauth\Models\Service;
 
 class CasController extends Controller
 {

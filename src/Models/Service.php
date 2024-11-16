@@ -1,6 +1,6 @@
 <?php
 
-namespace Friezer-85\CasOauth\Models;
+namespace Friezer\CasOauth\Models;
 
 use Illuminate\Http\RedirectResponse;
 

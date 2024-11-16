@@ -22,13 +22,13 @@ Route::group([
     'prefix' => '/cas/',
     'as' => 'cas.'
   ], function () {
-    Route::get('/login', '\Friezer-85\CasOauth\Controllers\CasController@login')
+    Route::get('/login', '\Friezer\CasOauth\Controllers\CasController@login')
       ->name('login');
 
-    Route::get('/serviceValidate', '\Friezer-85\CasOauth\Controllers\CasController@serviceValidate')
+    Route::get('/serviceValidate', '\Friezer\CasOauth\Controllers\CasController@serviceValidate')
       ->name('serviceValidate');
 
-    Route::post('/samlValidate', '\Friezer-85\CasOauth\Controllers\CasController@samlValidate')
+    Route::post('/samlValidate', '\Friezer\CasOauth\Controllers\CasController@samlValidate')
       ->name('samlValidate');
   });
 
@@ -36,10 +36,10 @@ Route::group([
       'prefix' => '/oauth/',
       'as' => 'oauth.'
   ], function () {
-    Route::get('/login', '\Friezer-85\CasOauth\Controllers\OauthController@login')
+    Route::get('/login', '\Friezer\CasOauth\Controllers\OauthController@login')
       ->name('login');
 
-    Route::get('/callback', '\Friezer-85\CasOauth\Controllers\OauthController@callback')
+    Route::get('/callback', '\Friezer\CasOauth\Controllers\OauthController@callback')
       ->name('callback');
   });
 });
