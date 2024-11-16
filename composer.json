@@ -19,13 +19,13 @@
     ],
     "autoload": {
         "psr-4": {
-            "Friezer-85\\CasOauth\\": "src/"
+            "Friezer\\CasOauth\\": "src/"
         }
     },
     "extra": {
         "laravel": {
 			"providers": [
-                "Friezer-85\\CasOauth\\ServiceProvider"
+                "Friezer\\CasOauth\\ServiceProvider"
             ]
         }
     },
