@@ -1,5 +1,5 @@
 {
-    "name": "micorksen/cas-oauth-laravel",
+    "name": "friezer-85/cas-oauth-laravel",
     "description": "A way to bridge an OAuth provider to a CAS-only application.",
     "type": "library",
     "license": "GPL-3.0-only",
@@ -19,13 +19,13 @@
     ],
     "autoload": {
         "psr-4": {
-            "Micorksen\\CasOauth\\": "src/"
+            "Friezer-85\\CasOauth\\": "src/"
         }
     },
     "extra": {
         "laravel": {
 			"providers": [
-                "Micorksen\\CasOauth\\ServiceProvider"
+                "Friezer-85\\CasOauth\\ServiceProvider"
             ]
         }
     },
