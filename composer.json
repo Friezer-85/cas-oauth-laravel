@@ -30,7 +30,7 @@
         }
     },
     "require": {
-        "laravel/framework": "*",
-        "socialiteproviders/manager": "*"
+        "laravel/framework": "^12.0",
+        "socialiteproviders/manager": "^4.8"
     }
 }
