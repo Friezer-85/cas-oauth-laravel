@@ -13,9 +13,7 @@ Ce package permet de transformer n'importe quel provider OAuth en serveur CAS, i
 - [Configuration](#-configuration)
 - [Utilisation](#-utilisation)
 - [Providers supportés](#-providers-supportés)
-- [Développement](#-développement)
 - [Dépannage](#-dépannage)
-- [Licence](#-licence)
 
 ---
 
@@ -165,7 +163,7 @@ return [
         'https://app2\.example\.com/(.*)',
         
         // Pour le développement local
-        'http://localhost:3000/(.*)',
+        'http://localhost/(.*)',
         'http://127\.0\.0\.1:8000/(.*)',
     ],
 ];
