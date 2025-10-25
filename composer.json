@@ -1,6 +1,6 @@
 {
     "name": "friezer-85/cas-oauth-laravel",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "description": "A simple way to bridge an OAuth provider to a CAS-only application.",
     "type": "library",
     "license": "GPL-3.0-only",
