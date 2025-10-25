@@ -1,21 +1,15 @@
 {
     "name": "friezer-85/cas-oauth-laravel",
-    "version": "2.0.4",
+    "version": "2.0.5",
     "description": "A way to bridge an OAuth provider to a CAS-only application.",
     "type": "library",
     "license": "GPL-3.0-only",
     "authors": [
         {
-            "name": "Matteo C.",
-            "email": "hello@micorksen.eu",
-            "homepage": "https://micorksen.eu",
-            "role": "Developer"
-        },
-        {
             "name": "Friezer",
             "email": "hello@friezer.eu",
             "homepage": "https://friezer.eu",
-            "role": "Maintener"
+            "role": "Developer and Maintener"
         }
     ],
     "autoload": {

@@ -141,7 +141,6 @@ OAUTH_PARAMS=
 <?php
 
 return [
-    // ... autres services (postmark, ses, etc.)
 
     /*
     |--------------------------------------------------------------------------

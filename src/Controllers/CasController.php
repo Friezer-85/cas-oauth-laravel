@@ -4,27 +4,16 @@ namespace Friezer\CasOauth\Controllers;
 
 use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
-use Illuminate\Support\Facades\Cache;
-use Carbon\Carbon;
-
 use Friezer\CasOauth\Models\Ticket;
 use Friezer\CasOauth\Models\Service;
 
 class CasController extends Controller
 {
-    /**
-     * Provides the function for the `/login` endpoint.
-     *
-     * @return Response|RedirectResponse
-     * @throws NotFoundExceptionInterface
-     * @throws ContainerExceptionInterface
-     */
-    public function login(): Response | RedirectResponse
+    public function login(): Response|RedirectResponse
     {
         $user = session('cas-oauth.cas.user');
-        $service = new Service(request()->get('service', ''));
+        $serviceUrl = request()->get('service', '');
+        $service = new Service($serviceUrl);
 
         if (!$service->validate()) {
             return response('INVALID_SERVICE', 400)
@@ -41,58 +30,75 @@ class CasController extends Controller
             'cas-oauth.cas.user'
         ]);
 
-        $ticket = (new Ticket())
-            ->generate(request()->get('service'), $user);
+        $ticketId = Ticket::generate($service->url, $user, request()->boolean('renew'));
 
-        return $service->redirect($ticket);
+        return $service->redirect($ticketId);
     }
 
-    /**
-     * Provides the function for the `/samlValidate` endpoint.
-     *
-     * @param bool $attributes
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     * @return Response
-     */
-    public function samlValidate(bool $attributes = true): Response
+    public function serviceValidate(): Response
     {
-        $ticket = Ticket::find(Ticket::convert_ticket_id(request()->get('ticket'))) ?? new Ticket();
-        $service = request()->input('service') ?? request()->input('target') ?? request()->input('TARGET', '');
-        $valid = $ticket->validate($service, request()->boolean('renew'));
+        return $this->validateTicket();
+    }
 
-        if (is_object($valid)) {
-            $response = [
-                'authenticationSuccess' => [
-                    'user' => $valid->user[env('CAS_PROPERTY', 'id')],
-                    'attributes' => $valid->user,
-                    'proxyGrantingTicket' => null,
-                ],
-            ];
-        } else {
-            $response = [
-                'authenticationFailure' => [
-                    'code' => $valid,
-                    'description' => 'Ticket ' . request()->get('ticket') . ' not recognized.',
-                ],
-            ];
+    public function samlValidate(): Response
+    {
+        return $this->validateTicket();
+    }
+
+    private function validateTicket(): Response
+    {
+        $ticketParam = request()->get('ticket', '');
+        $serviceUrl = request()->input('service') 
+            ?? request()->input('target') 
+            ?? request()->input('TARGET', '');
+
+        if (empty($ticketParam) || empty($serviceUrl)) {
+            return $this->errorResponse('INVALID_REQUEST', 'Missing ticket or service parameter');
         }
+
+        $ticket = Ticket::findByTicket($ticketParam);
+
+        if (!$ticket) {
+            return $this->errorResponse('INVALID_TICKET', "Ticket {$ticketParam} not recognized");
+        }
+
+        $validationResult = $ticket->validate($serviceUrl, request()->boolean('renew'));
+
+        if (is_string($validationResult)) {
+            return $this->errorResponse($validationResult, "Ticket {$ticketParam} not recognized");
+        }
+
+        $casProperty = config('cas-oauth.cas_property', 'id');
+        $userData = $validationResult->user;
+
+        return $this->successResponse($userData[$casProperty] ?? $userData['id'], $userData);
+    }
+
+    private function successResponse(string $user, array $attributes): Response
+    {
+        $response = [
+            'authenticationSuccess' => [
+                'user' => $user,
+                'attributes' => $attributes,
+            ],
+        ];
 
         return response()
             ->view('cas-oauth::ticket', $response)
             ->header('Content-Type', 'application/xml');
     }
-  
-    /**
-     * Provides the function for the `/serviceValidate` endpoint.
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     * @return Response
-     */
-    public function serviceValidate(): Response
+
+    private function errorResponse(string $code, string $description = ''): Response
     {
-        return $this->samlValidate(false);
+        $response = [
+            'authenticationFailure' => [
+                'code' => $code,
+                'description' => $description ?: "Ticket validation failed with code: {$code}",
+            ],
+        ];
+
+        return response()
+            ->view('cas-oauth::ticket', $response)
+            ->header('Content-Type', 'application/xml');
     }
 }

@@ -1,57 +1,47 @@
 <?php
-
 namespace Friezer\CasOauth\Models;
 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Collection;
 
 class Service
 {
-    /**
-     * The services of the CAS server.
-     * 
-     * @var array
-     */
-    private $services;
+    private Collection $services;
+    public string $url;
 
-    /**
-     * The URL of the service associated with the model.
-     * 
-     * @var string
-     */
-    public $url;
-
-    /**
-     * Collects all the services.
-     * @param string $url
-     * 
-     * @return void
-     */
     public function __construct(string $url)
     {
-        $this->services = collect(config('services.cas'));
+        $this->services = collect(config('services.cas', []));
         $this->url = $url;
     }
 
-    /**
-     * Validates a service.
-     * 
-     * @return bool
-     */
     public function validate(): bool
     {
-        return $this->services->first(function ($value, $key) {
-            return preg_match("#{$value}#", $this->url);
-        }, false);
+        if (empty($this->url)) {
+            return false;
+        }
+
+        return $this->services->contains(function (string $pattern) {
+            $result = @preg_match("#{$pattern}#", $this->url);
+            
+            if ($result === false) {
+                \Log::warning("Invalid CAS service regex pattern: {$pattern}");
+                return false;
+            }
+            
+            return $result === 1;
+        });
     }
 
-    /**
-     * Redirects to a service.
-     * @param string $ticket
-     * 
-     * @return RedirectResponse
-     */
     public function redirect(string $ticket): RedirectResponse
     {
-        return new RedirectResponse($this->url . (str_contains($this->url, '?') ? '&' : '?') . 'ticket=' . urlencode($ticket));
+        if (empty($this->url)) {
+            throw new \InvalidArgumentException('Cannot redirect to empty service URL');
+        }
+
+        $separator = str_contains($this->url, '?') ? '&' : '?';
+        $redirectUrl = $this->url . $separator . 'ticket=' . urlencode($ticket);
+        
+        return new RedirectResponse($redirectUrl);
     }
 }

@@ -5,12 +5,13 @@
 	  @if (isset($authenticationSuccess['attributes']))
         <cas:attributes>
           @foreach ($authenticationSuccess['attributes'] as $key => $value)
+            @php $cleanKey = preg_replace('/[^a-zA-Z0-9_-]/', '_', $key); @endphp
             @if (is_array($value))
               @foreach ($value as $value2)
-                <cas:{{ $key }}>{{ $value2 }}</cas:{{ $key }}>
+                <cas:{{ $cleanKey }}>{{ $value2 }}</cas:{{ $cleanKey }}>
               @endforeach
             @else
-              <cas:{{ $key }}>{{ $value }}</cas:{{ $key }}>
+              <cas:{{ $cleanKey }}>{{ $value }}</cas:{{ $cleanKey }}>
             @endif
           @endforeach
         </cas:attributes>

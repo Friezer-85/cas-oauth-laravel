@@ -1,5 +1,4 @@
 <?php
-
 namespace Friezer\CasOauth\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -8,179 +7,128 @@ use Carbon\Carbon;
 
 class Ticket extends Model
 {
-    /**
-     * The table associated with the model.
-     * 
-     * @var string
-     */
     protected $table = 'tickets';
-
-    /**
-     * Indicates if the IDs are auto-incrementing.
-     *
-     * @var bool
-     */
     public $incrementing = false;
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
     public $timestamps = false;
-
-    /**
-     * The attributes that should be cast to native types.
-     * 
-     * @var array
-     */
+    
     protected $casts = [
         'user' => 'json',
         'renew' => 'boolean',
+        'createdAt' => 'datetime',
     ];
 
-    /**
-     * Indicates the maximum interval for a ticket.
-     * 
-     * @var string
-     */
-    public $maximumInterval;
+    protected $fillable = [
+        'id',
+        'service',
+        'user',
+        'renew',
+        'createdAt',
+    ];
 
-    /**
-     * The constructor for the model.
-     * @param array $attributes
-     * 
-     * @return void
-     */
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-        $this->maximumInterval = '10 seconds';
-    }
+    private const MAXIMUM_INTERVAL_SECONDS = 10;
+    private const TICKET_ID_LENGTH = 32;
 
-    /**
-     * Generates a random string.
-     * 
-     * @var int $length
-     * @var string $characters
-     * 
-     * @return string
-     */
-    private function random_string(int $length, string $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'): string
+    private static function generateRandomString(int $length): string
     {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $result = '';
-        $max = mb_strlen($characters, '8bit') - 1;
-        for ($i = 0; $i < $length; ++$i) {
+        $max = strlen($characters) - 1;
+        
+        for ($i = 0; $i < $length; $i++) {
             $result .= $characters[random_int(0, $max)];
         }
-
+        
         return $result;
     }
 
-    /**
-     * Generates an ID for a ticket.
-     * 
-     * @return string
-     */
-    private function get_id(): string
+    private static function generateUniqueId(): string
     {
-        do {
-            $key = $this->random_string(32);
-            if (!self::where('id', '=', $key)->exists()) {
+        $maxAttempts = 10;
+        
+        for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
+            $key = self::generateRandomString(self::TICKET_ID_LENGTH);
+            
+            if (!self::where('id', $key)->exists()) {
                 return $key;
             }
-        } while(true);
+        }
+        
+        throw new \RuntimeException('Failed to generate unique ticket ID after ' . $maxAttempts . ' attempts');
     }
 
-    /**
-     * Returns the ticket prefix.
-     * 
-     * @return string
-     */
-    private static function ticket_prefix(): string
+    private static function getTicketPrefix(): string
     {
-        return 'ST-' . str_replace(['http:', 'https:', '/'], '', url('/')) . '-';
+        $domain = str_replace(['http:', 'https:', '/'], '', url('/'));
+        return "ST-{$domain}-";
     }
 
-    /**
-     * Converts an ID to a ticket ID.
-     * @param string $id
-     * 
-     * @return string
-     */
-    private function convert_id(string $id): string
+    private static function convertIdToTicket(string $id): string
     {
-        return $this->ticket_prefix() . $id;
+        return self::getTicketPrefix() . $id;
     }
 
-    /**
-     * Converts a ticket ID to an ID.
-     * @param string $id
-     * 
-     * @return string
-     */
-    public static function convert_ticket_id(string $id): string
+    public static function convertTicketToId(string $ticket): ?string
     {
-        $prefix = self::ticket_prefix();
-        return substr($id, 0, strlen($prefix)) !== $prefix ? "" : substr($id, strlen($prefix));
+        $prefix = self::getTicketPrefix();
+        
+        if (!str_starts_with($ticket, $prefix)) {
+            return null;
+        }
+        
+        return substr($ticket, strlen($prefix));
     }
 
-    /**
-     * Generates a ticket.
-     * @param string $service
-     * @param User $user
-     * @param bool $renew
-     * 
-     * @return string
-     */
-    public function generate(string $service, User $user, bool $renew = false): string
+    public static function generate(string $service, User $user, bool $renew = false): string
     {
-        $ticket = new self;
-        $ticket->id = $this->get_id();
+        $ticket = new self();
+        $ticket->id = self::generateUniqueId();
         $ticket->service = $service;
         $ticket->user = $user->user;
         $ticket->renew = $renew;
         $ticket->createdAt = Carbon::now();
         $ticket->save();
 
-        return $this->convert_id($ticket->id);
+        return self::convertIdToTicket($ticket->id);
     }
 
-    /**
-     * Validates a ticket.
-     * @param string $service
-     * @param bool $renew
-     * 
-     * @return Ticket|string
-     */
-    public function validate(string $service, bool $renew): Ticket | string
+    public function validate(string $service, bool $renew): self|string
     {
-        if (!$this || !$service) {
+        if (empty($service)) {
             return 'INVALID_REQUEST';
         }
 
-        $ticket = $this->id;
-        if (!$ticket) {
+        if (empty($this->id)) {
             return 'INVALID_TICKET_SPEC';
         }
 
-        $ticket = $this->where('id', '=', $ticket)
-            ->where('createdAt', '>', Carbon::parse("-{$this->maximumInterval}"))
-            ->first();
-
-        if (is_null($ticket)) {
+        $expirationThreshold = Carbon::now()->subSeconds(self::MAXIMUM_INTERVAL_SECONDS);
+        
+        if ($this->createdAt < $expirationThreshold) {
+            $this->delete();
             return 'INVALID_TICKET';
         }
 
-        $this->delete();
-        if ($ticket->service != $service) {
+        if ($this->service !== $service) {
             return 'INVALID_SERVICE';
         }
 
-        if ($renew && !$ticket->renew) {
+        if ($renew && !$this->renew) {
             return 'INVALID_RENEW';
         }
 
-        return $ticket;
+        $this->delete();
+        
+        return $this;
+    }
+
+    public static function findByTicket(string $ticket): ?self
+    {
+        $id = self::convertTicketToId($ticket);
+        
+        if ($id === null) {
+            return null;
+        }
+        
+        return self::find($id);
     }
 }
