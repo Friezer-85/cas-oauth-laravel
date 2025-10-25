@@ -10,7 +10,7 @@ Route::prefix('cas')
     Route::get('/login', [CasController::class, 'login'])->name('login');
     Route::get('/serviceValidate', [CasController::class, 'serviceValidate'])->name('serviceValidate');
     Route::post('/samlValidate', [CasController::class, 'samlValidate'])
-      ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])
+      ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])
       ->name('samlValidate');
   });
 
